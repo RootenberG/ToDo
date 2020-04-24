@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Vue-js | Django | ToDolist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A simple crud app made with the vue js and django">
+
+  <meta name="keywords" content="vuejs, django, crudapp, restapi">
+  <!-- bootstap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script>
+    import image from "../../static/images/tick.jpg";
+  </script>
+  <!-- boostrap css -->
+  <style>
+    /* Absolute Center Spinner */
+    .loading {
+      position: fixed;
+      z-index: 999;
+      height: 2em;
+      width: 2em;
+      overflow: show;
+      margin: auto;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+
+    /* Transparent Overlay */
+    .loading:before {
+      content: '';
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    /* :not(:required) hides these rules from IE9 and below */
+    .loading:not(:required) {
+      font: 0/0 a;
+      color: transparent;
+      text-shadow: none;
+      background-color: transparent;
+      border: 0;
+    }
+
+    .loading:not(:required):after {
+      content: '';
+      display: block;
+      font-size: 10px;
+      width: 1em;
+      height: 1em;
+      margin-top: -0.5em;
+      -webkit-animation: spinner 1500ms infinite linear;
+      -moz-animation: spinner 1500ms infinite linear;
+      -ms-animation: spinner 1500ms infinite linear;
+      -o-animation: spinner 1500ms infinite linear;
+      animation: spinner 1500ms infinite linear;
+      border-radius: 0.5em;
+      -webkit-box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.5) -1.5em 0 0 0, rgba(0, 0, 0, 0.5) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+      box-shadow: rgba(0, 0, 0, 0.747) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) -1.5em 0 0 0, rgba(0, 0, 0, 0.75) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+    }
+
+    .label {
+      display: block;
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid #000;
+      border-radius: 50%;
+      position: absolute;
+      background: #fff;
+      cursor: pointer;
+
+    }
+    .form-group {
+      display: flex;
+    }
+
+    .input_wrapper {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+
+    }
+
+    .label.checked {
+      background: url('https://raw.githubusercontent.com/RootenberG/ToDo/master/myproject/static/images/tick.jpg');
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      border: none;
+    }
+
+    .article_header {
+      cursor: pointer;
+      font-size: 20px;
+      margin-left: 15px;
+    }
+
+    .todo_item {
+      display: flex;
+      align-items: center;
+      margin: 10px 20px 0;
+    }
+
+    .delete_icon {
+      width: 20px;
+      height: 20px;
+      background: url('https://image.flaticon.com/icons/svg/2089/2089743.svg');
+      background-repeat: no-repeat;
+      background-size: contain;
+      cursor: pointer;
+    }
+
+    .todo_wrapper {
+      width: 370px;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e0e0e0;
+
+    }
+
+    .todo_header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 10px;
+      background-color: #F3F3F3;
+    }
+
+    .todo_title {
+      font-size: 1.5em;
+    }
+
+    .todo {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input {
+      margin-right: 5px;
+      width: 5px;
+      height: 5px;
+    }
+
+    label {
+      margin-bottom: 0;
+    }
+
+    .button {
+      display: none;
+
+    }
+
+    .input_field {
+      width: 100%;
+      padding-right: 20px;
+    }
+
+    .plusB {
+      background: url(https://image.flaticon.com/icons/svg/1828/1828925.svg);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      border: none;
+      width: 15px;
+      height: 15px;
+      outline: none !important;
+      margin-right: 10px;
+    }
+
+    #article_heading {
+      padding: 10px;
+    }
+
+    .modal-body {
+      margin-top: 10px;
+      padding: 0 0 0 23px;
+    }
+
+    /* Animation */
+
+    @-webkit-keyframes spinner {
+      0% {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+      }
+
+      100% {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+    }
+
+    @-moz-keyframes spinner {
+      0% {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+      }
+
+      100% {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+    }
+
+    @-o-keyframes spinner {
+      0% {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+      }
+
+      100% {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes spinner {
+      0% {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+      }
+
+      100% {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div id="starting">
+    <div class="container">
+      <div>
+        <div class="todo_wrapper">
+          <div class="todo_header">
+            <div class="todo_title">TODO List</div>
+            <div class="delete_icon" @click="deleteSelected">
+            </div>
+          </div>
+          <div class="todo">
+            <div class="todo_item" v-for="(article,i) in articles">
+              <div class='input_wrapper'>
+                <label class="label" :for="'button' + i" :class="{'checked': article.state}"></label>
+                <input type="checkbox" class="button" :id="'button' + i" v-model="article.state">
+              </div>
+              <div class='article_header' @click="getArticle(article.article_id)">
+                ${article.article_heading}
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="modal-body">
+              <div class="form-group">
+                <div>
+                  <button type="submit" class="plusB" @click="addArticle()"></button>
+                </div>
+                <div class='input_field'>
+                  <input type="text" class="form-control" id="article_heading" v-model="newArticle.article_heading"
+                  required="required" @change='handleChange()'>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Article Modal -->
+        <div class="modal fade" id="editArticleModal" tabindex="-1" role="dialog"
+          aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">EDIT ARTICLE</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form v-on:submit.prevent="updateArticle()">
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label for="article_heading">Article Heading</label>
+                    <input type="text" class="form-control" id="article_heading" placeholder="Enter Article Heading"
+                      v-model="currentArticle.article_heading" required="required">
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary m-progress" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="loading" v-if="loading===true">Loading&#8230;</div>
+        </div>
+        <!-- End of edit article modal -->
+
+      </div>
+    </div>
+    <div class="loading" v-if="loading===true">Loading&#8230;</div>
+
+  </div>
+
+  <!-- bootrtap js files -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+  <!-- vue.js files -->
+
+ 
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.5"></script>
+  <script type="text/javascript">
+
+
+    Vue.http.headers.common['X-CSRFToken'] = "{{ csrf_token }}";
+    new Vue({
+      el: '#starting',
+      delimiters: ['${', '}'],
+      data: {
+        selecteArticles: [],
+        articles: [],
+        loading: false,
+        currentArticle: {},
+        message: null,
+        newArticle: { 'article_heading': '', 'state': false, },
+      },
+      mounted: function () {
+        this.getArticles();
+      },
+      watch: {
+        'articles': {
+          handler() {
+            this.updateTodo();
+          },
+          deep: true
+        }
+      },
+      methods: {
+        handleChange() {
+          this.addArticle();
+        },
+        getArticles: function () {
+          let api_url = '/api/article/';
+          if (this.search_term !== '' || this.search_term !== null) {
+            api_url = `/api/article/?search=${this.search_term}`
+          }
+          this.loading = true;
+          this.$http.get(api_url)
+            .then((response) => {
+              this.articles = response.data;
+              this.loading = false;
+            })
+            .catch((err) => {
+              this.loading = false;
+              console.log(err);
+            })
+        },
+        getArticle: function (id) {
+          this.loading = true;
+          this.$http.get(`/api/article/${id}/`)
+            .then((response) => {
+              this.currentArticle = response.data;
+              $("#editArticleModal").modal('show');
+              this.loading = false;
+            })
+            .catch((err) => {
+              this.loading = false;
+              console.log(err);
+            })
+        },
+        addArticle: function () {
+          this.loading = true;
+          if (this.newArticle.article_heading === '') {
+            this.loading = false;
+            return;
+          }
+          this.$http.post('/api/article/', this.newArticle)
+            .then((response) => {
+              this.loading = true;
+              this.newArticle.article_heading = '';
+              this.getArticles();
+            })
+            .catch((err) => {
+              this.loading = true;
+              console.log(err);
+            })
+        },
+        updateArticle: function () {
+          this.loading = true;
+          this.$http.put(`/api/article/${this.currentArticle.article_id}/`, this.currentArticle)
+            .then((response) => {
+              this.loading = false;
+              this.currentArticle = response.data;
+              this.getArticles();
+            })
+            .catch((err) => {
+              this.loading = false;
+              console.log(err);
+            })
+        },
+        updateTodo() {
+          this.articles.forEach(el => {
+            this.$http.put(`/api/article/${el.article_id}/`, el)
+              .then((response) => {
+
+              })
+              .catch((err) => {
+                // console.log(err);
+              })
+          })
+        },
+        deleteSelected() {
+          let temp = this.articles.filter(el => el.state === true);
+          if (temp.length) {
+            this.articles = temp;
+            this.articles.forEach(el => {
+              this.$http.delete(`/api/article/${el.article_id}/`)
+                .then((response) => {
+                  this.getArticles();
+                })
+                .catch((err) => {
+                  console.log(err);
+                })
+            })
+          }
+
+        },
+        deleteArticle: function (id) {
+          this.loading = true;
+          this.$http.delete(`/api/article/${id}/`)
+            .then((response) => {
+              this.loading = false;
+              this.getArticles();
+            })
+            .catch((err) => {
+              this.loading = false;
+              console.log(err);
+            })
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
